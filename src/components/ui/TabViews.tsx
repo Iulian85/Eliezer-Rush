@@ -2,6 +2,7 @@ import React from 'react';
 import { useGameStore } from '../../store/useGameStore';
 import { tg } from '../../utils/telegram';
 import ClayIcon from './ClayIcon';
+import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 
 interface PropsWithChildren {
     children: React.ReactNode;
@@ -200,6 +201,21 @@ export const FrensTab = () => {
 // --- WALLET TAB ---
 export const WalletTab = () => {
     const { walletBalance } = useGameStore();
+    const [tonConnectUI] = useTonConnectUI();
+    const wallet = useTonWallet();
+
+    const handleWalletAction = () => {
+        if (wallet) {
+            tonConnectUI.disconnect();
+        } else {
+            tonConnectUI.openModal();
+        }
+    };
+
+    const formatAddress = (address: string) => {
+        return address.slice(0, 4) + '...' + address.slice(-4);
+    };
+
     return (
         <div className="w-full h-full pt-20 px-6 pb-32">
             <SectionTitle>Wallet</SectionTitle>
@@ -220,24 +236,32 @@ export const WalletTab = () => {
             </div>
 
             <div className="space-y-4">
-                 <div className="bg-white/60 border border-white rounded-3xl p-5 flex items-center justify-between shadow-sm hover:bg-white/80 transition-colors">
+                 {/* Connect Wallet Card */}
+                 <div className={`bg-white/60 border border-white rounded-3xl p-5 flex items-center justify-between shadow-sm transition-colors ${wallet ? 'bg-green-50/80 border-green-200' : 'hover:bg-white/80'}`}>
                     <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner text-green-600">
-                            🔗
+                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${wallet ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                            {wallet ? '✅' : '💎'}
                          </div>
                          <div className="flex flex-col">
-                             <span className="font-black text-ref-text text-sm">Connect Wallet</span>
-                             <span className="text-xs text-ref-text-light font-bold">TON Network</span>
+                             <span className="font-black text-ref-text text-sm">
+                                {wallet ? 'Wallet Connected' : 'Connect Wallet'}
+                             </span>
+                             <span className="text-xs text-ref-text-light font-bold">
+                                {wallet ? formatAddress(wallet.account.address) : 'TON Network'}
+                             </span>
                          </div>
                     </div>
-                    <button className="bg-ref-text text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-clay-btn active:scale-95 transition-transform">
-                        Connect
+                    <button 
+                        onClick={handleWalletAction}
+                        className={`px-5 py-2.5 rounded-xl text-xs font-bold shadow-clay-btn active:scale-95 transition-transform ${wallet ? 'bg-gray-200 text-gray-500' : 'bg-ref-text text-white'}`}
+                    >
+                        {wallet ? 'Disconnect' : 'Connect'}
                     </button>
                  </div>
                  
                  <div className="bg-white/60 border border-white rounded-3xl p-5 flex items-center justify-between shadow-sm opacity-70">
                     <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner text-blue-500">
+                         <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner text-orange-500">
                             🏦
                          </div>
                          <div className="flex flex-col">

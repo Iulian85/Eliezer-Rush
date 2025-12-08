@@ -12,6 +12,7 @@
     "@react-three/drei": "9.100.0",
     "@react-three/fiber": "8.15.16",
     "@react-three/postprocessing": "2.16.0",
+    "@tonconnect/ui-react": "^2.0.0",
     "@twa-dev/sdk": "^7.0.0",
     "canvas-confetti": "^1.9.2",
     "clsx": "2.1.0",

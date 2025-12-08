@@ -1,0 +1,8 @@
+{
+  "name": "Eliezer Rush",
+  "description": "A spectacular 3D crypto match-3 game on Telegram.",
+  "iconUrl": "https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/ton-connect.png",
+  "url": "https://t.me/EliezerRushBot",
+  "termsOfUseUrl": "https://ton.org/terms",
+  "privacyPolicyUrl": "https://ton.org/privacy"
+}
