@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg, #A5C9FF 0%, #EBF4FF 100%); /* The Soft Periwinkle Gradient */
+  background-attachment: fixed;
+  color: #475569;
+  font-family: 'Varela Round', sans-serif; /* Soft rounded font */
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Glassmorphism Card Style - Matching the reference "Frosted" look */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 32px;
+  box-shadow: 0 20px 40px -10px rgba(165, 201, 255, 0.5);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+}
+
+/* 3D Button Style (CSS Clay) */
+.btn-primary-3d {
+  background: linear-gradient(135deg, #FFB085 0%, #FF844B 100%);
+  color: white;
+  border-radius: 24px;
+  box-shadow: 
+    0 10px 20px rgba(255, 132, 75, 0.3),
+    inset 0 3px 6px rgba(255, 255, 255, 0.4),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary-3d:active {
+  transform: scale(0.98) translateY(2px);
+  box-shadow: 
+    0 4px 10px rgba(255, 132, 75, 0.2),
+    inset 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 3D Model Simulation for UI (The "Block" look) */
+.clay-model {
+  position: relative;
+  border-radius: 28px;
+  /* Thick bevel at bottom to simulate 3D height */
+  border-bottom: 6px solid rgba(0,0,0,0.05); 
+  box-shadow: 
+    0 15px 30px -5px rgba(0,0,30,0.15),
+    inset 0 3px 5px rgba(255,255,255,0.7),
+    inset 0 -3px 5px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.clay-model:active {
+  transform: translateY(4px);
+  border-bottom-width: 2px;
+  box-shadow: 
+    0 5px 15px -5px rgba(0,0,30,0.1),
+    inset 0 3px 5px rgba(255,255,255,0.7),
+    inset 0 -3px 5px rgba(0,0,0,0.05);
+}
+
+/* 3D Sphere Simulation */
+.clay-sphere {
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 20%),
+              linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
+  box-shadow: 
+    0 10px 20px -5px rgba(0,0,0,0.2),
+    inset 0 -5px 10px rgba(0,0,0,0.1);
+}
+
+/* Soft Icon Container */
+.icon-box-3d {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+  box-shadow: 
+    0 10px 20px rgba(165, 201, 255, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 1);
+  border-radius: 24px;
+}
+
+/* Scrollbar hidden for cleaner UI */
+::-webkit-scrollbar {
+  display: none;
+}
