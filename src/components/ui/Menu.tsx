@@ -1,3 +1,4 @@
+
 import { useGameStore } from '../../store/useGameStore';
 import Navigation from './Navigation';
 import { ShopTab, TasksTab, FrensTab, WalletTab } from './TabViews';
@@ -25,6 +26,18 @@ export default function Menu() {
     initGame(1);
   };
 
+  const handleClaimReward = async () => {
+    if (isLoadingAd || !isRewardAvailable) return;
+    
+    setIsLoadingAd(true);
+    // Show Ad before claiming reward
+    await showAd();
+    
+    // Grant reward after ad
+    claimDailyReward();
+    setIsLoadingAd(false);
+  };
+
   const renderContent = () => {
     switch(activeTab) {
         case 'TASKS': return <TasksTab />;
@@ -44,8 +57,8 @@ export default function Menu() {
                         
                         {/* Daily Reward Button */}
                         <button
-                            onClick={claimDailyReward}
-                            disabled={!isRewardAvailable}
+                            onClick={handleClaimReward}
+                            disabled={!isRewardAvailable || isLoadingAd}
                             className={`w-full py-3 rounded-2xl font-black text-sm tracking-wide shadow-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
                                 isRewardAvailable 
                                     ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white shadow-clay-btn border border-emerald-300 animate-pulse' 
@@ -53,7 +66,7 @@ export default function Menu() {
                             }`}
                         >
                             <span className="text-lg">{isRewardAvailable ? '🎁' : '✅'}</span>
-                            {isRewardAvailable ? 'CLAIM DAILY REWARD (+100)' : 'REWARD CLAIMED'}
+                            {isLoadingAd && isRewardAvailable ? 'LOADING AD...' : (isRewardAvailable ? 'CLAIM DAILY REWARD (+100)' : 'REWARD CLAIMED')}
                         </button>
 
                         {/* Play Button - Big Orange Pill */}
