@@ -86,13 +86,35 @@ const ClayIcon: React.FC<{ type: string; className?: string }> = ({ type, classN
             case 'shuffle':
                 return (
                     <g filter="url(#dropShadow)">
-                        {/* Top Arrow */}
-                        <path d="M20 40 C30 40, 50 40, 60 25 L55 20 M60 25 L55 30" stroke="url(#grad-shuffle)" strokeWidth="12" strokeLinecap="round" fill="none" />
-                        {/* Bottom Arrow */}
-                        <path d="M20 60 C30 60, 50 60, 60 75 L55 70 M60 75 L55 80" stroke="url(#grad-shuffle)" strokeWidth="12" strokeLinecap="round" fill="none" />
-                        {/* Crossing Lines (Simulated) */}
-                        <path d="M25 40 Q40 40 45 50" stroke="url(#grad-shuffle)" strokeWidth="12" strokeLinecap="round" fill="none" />
-                         <path d="M25 60 Q40 60 45 50" stroke="url(#grad-shuffle)" strokeWidth="12" strokeLinecap="round" fill="none" />
+                         {/* Back Arrow (Top-Left to Bottom-Right) - Darker Shade for Depth */}
+                        <path 
+                            d="M 22 35 C 45 35, 55 65, 78 65" 
+                            stroke="#FF844B" 
+                            strokeWidth="18" 
+                            strokeLinecap="round" 
+                            fill="none" 
+                        />
+                        <path d="M72 56 L90 65 L72 74" fill="#FF844B" />
+
+                        {/* Front Arrow (Bottom-Left to Top-Right) - Gradient */}
+                        <path 
+                            d="M 22 65 C 45 65, 55 35, 78 35" 
+                            stroke="url(#grad-shuffle)" 
+                            strokeWidth="18" 
+                            strokeLinecap="round" 
+                            fill="none" 
+                        />
+                        <path d="M72 44 L90 35 L72 26" fill="url(#grad-shuffle)" />
+
+                        {/* Specular Highlight on Front Arrow */}
+                         <path 
+                            d="M 25 65 C 45 65, 53 40, 75 38" 
+                            stroke="url(#highlight)" 
+                            strokeWidth="5" 
+                            strokeLinecap="round" 
+                            fill="none"
+                            opacity="0.7" 
+                        />
                     </g>
                 );
             case 'extraMoves':
