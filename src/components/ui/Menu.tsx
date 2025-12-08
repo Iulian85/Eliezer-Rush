@@ -2,11 +2,18 @@ import { useGameStore } from '../../store/useGameStore';
 import Navigation from './Navigation';
 import { ShopTab, TasksTab, FrensTab, WalletTab } from './TabViews';
 import { showAd } from '../../utils/adsgram';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Menu() {
-  const { gameState, initGame, activeTab, walletBalance, user } = useGameStore();
+  const { gameState, initGame, activeTab, walletBalance, user, claimDailyReward, lastRewardClaimedDate } = useGameStore();
   const [isLoadingAd, setIsLoadingAd] = useState(false);
+  const [isRewardAvailable, setIsRewardAvailable] = useState(false);
+
+  // Check reward status on mount and when date changes
+  useEffect(() => {
+    const today = new Date().toDateString();
+    setIsRewardAvailable(lastRewardClaimedDate !== today);
+  }, [lastRewardClaimedDate]);
 
   if (gameState === 'PLAYING') return null;
 
@@ -33,8 +40,22 @@ export default function Menu() {
                     <div className="flex-1 w-full" /> 
 
                     {/* Bottom Action Area */}
-                    <div className="w-full max-w-sm flex flex-col gap-4">
+                    <div className="w-full max-w-sm flex flex-col gap-3">
                         
+                        {/* Daily Reward Button */}
+                        <button
+                            onClick={claimDailyReward}
+                            disabled={!isRewardAvailable}
+                            className={`w-full py-3 rounded-2xl font-black text-sm tracking-wide shadow-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                                isRewardAvailable 
+                                    ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white shadow-clay-btn border border-emerald-300 animate-pulse' 
+                                    : 'bg-white/40 text-ref-text/50 cursor-not-allowed border border-white/50'
+                            }`}
+                        >
+                            <span className="text-lg">{isRewardAvailable ? '🎁' : '✅'}</span>
+                            {isRewardAvailable ? 'CLAIM DAILY REWARD (+100)' : 'REWARD CLAIMED'}
+                        </button>
+
                         {/* Play Button - Big Orange Pill */}
                         <button
                             onClick={handleStartGame}
@@ -52,7 +73,7 @@ export default function Menu() {
                         </button>
                         
                         {/* Balance Pill */}
-                        <div className="glass-pill px-6 py-3 flex justify-between items-center w-full">
+                        <div className="glass-pill px-6 py-3 flex justify-between items-center w-full mt-1">
                              <div className="flex items-center gap-2">
                                 <span className="text-xl">🐹</span>
                                 <span className="font-bold text-ref-text text-sm">Balance</span>
@@ -75,7 +96,7 @@ export default function Menu() {
             {activeTab !== 'HOME' && (
                 <button 
                     onClick={() => useGameStore.getState().setActiveTab('HOME')}
-                    className="w-10 h-10 glass-pill flex items-center justify-center text-lg active:scale-95 transition-transform"
+                    className="w-10 h-10 glass-pill flex items-center justify-center text-lg active:scale-95 transition-transform shadow-sm"
                 >
                     ⬅
                 </button>
@@ -83,7 +104,7 @@ export default function Menu() {
             
             {activeTab === 'HOME' && <div />} {/* Spacer */}
 
-            <button className="w-10 h-10 glass-pill flex items-center justify-center text-lg active:scale-95 transition-transform">
+            <button className="w-10 h-10 glass-pill flex items-center justify-center text-lg active:scale-95 transition-transform shadow-sm">
                 ⋮
             </button>
         </div>
@@ -92,9 +113,6 @@ export default function Menu() {
             {renderContent()}
         </div>
         
-        {/* Navigation is only shown on HOME technically in the reference, but we keep it for usability or hide it if viewing sub-tabs? 
-            Reference implies sub-screens are full screen overlays. Let's keep Nav for easy access but style it soft.
-        */}
         <Navigation />
     </div>
   );
