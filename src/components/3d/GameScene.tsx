@@ -133,7 +133,7 @@ const Title3D = () => (
             </Float>
         </Center>
         
-        {/* RUSH - Chunky White Bubble Text */}
+        {/* RUSH - Chunky Orange Glass Text */}
         <Center top position={[0, -1.3, 0]}>
             <Float speed={2.5} rotationIntensity={0.1} floatIntensity={0.2} floatingRange={[-0.1, 0.1]}>
                     <Text3D
@@ -150,10 +150,15 @@ const Title3D = () => (
                 >
                     RUSH
                     <meshPhysicalMaterial 
-                        color="#FFFFFF" // Changed to White to match reference image
-                        roughness={0.1}
+                        color="#FF9F68" // Orange
+                        transmission={0.4} // Partial Glass transmission
+                        opacity={1}
                         metalness={0.0}
+                        roughness={0.2} // Frosted look
+                        ior={1.5}
+                        thickness={2.5} // Thick glass volume
                         clearcoat={1}
+                        clearcoatRoughness={0.1}
                     />
                 </Text3D>
             </Float>
