@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useGameStore } from '../../store/useGameStore';
 import { tg } from '../../utils/telegram';
+import ClayIcon from './ClayIcon';
 
 interface PropsWithChildren {
     children: React.ReactNode;
@@ -10,158 +10,6 @@ interface PropsWithChildren {
 const SectionTitle: React.FC<PropsWithChildren> = ({ children }) => (
     <h2 className="text-3xl font-black text-ref-text drop-shadow-sm mb-6 text-center tracking-wide">{children}</h2>
 );
-
-// --- 3D CLAY ICONS ---
-// These SVGs are hand-coded to simulate 3D matte plastic objects with lighting
-const ClayIcon: React.FC<{ type: string; className?: string }> = ({ type, className = "w-20 h-20" }) => {
-    
-    // Common Definitions for 3D Clay Effect (Gradients & Filters)
-    const defs = (
-        <defs>
-            {/* Soft Top-Left Light Source */}
-            <linearGradient id="highlight" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="white" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="white" stopOpacity="0" />
-            </linearGradient>
-            
-            {/* Deep Bottom-Right Shadow for Volume */}
-            <linearGradient id="shadow" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="black" stopOpacity="0" />
-                <stop offset="100%" stopColor="black" stopOpacity="0.3" />
-            </linearGradient>
-            
-            {/* Specific Material Gradients */}
-            <radialGradient id="grad-bomb" cx="30%" cy="30%" r="80%">
-                <stop offset="0%" stopColor="#475569" />
-                <stop offset="100%" stopColor="#1e293b" />
-            </radialGradient>
-            
-            <linearGradient id="grad-shuffle" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FFB085" />
-                <stop offset="100%" stopColor="#FF844B" />
-            </linearGradient>
-            
-            <linearGradient id="grad-bolt" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FCD34D" />
-                <stop offset="100%" stopColor="#F59E0B" />
-            </linearGradient>
-
-            <linearGradient id="grad-shield" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#6EE7B7" />
-                <stop offset="100%" stopColor="#10B981" />
-            </linearGradient>
-
-            {/* Drop Shadow Filter */}
-            <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-                <feOffset dx="2" dy="4" result="offsetblur" />
-                <feComponentTransfer>
-                    <feFuncA type="linear" slope="0.3" />
-                </feComponentTransfer>
-                <feMerge>
-                    <feMergeNode />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-    );
-
-    const renderIcon = () => {
-        switch(type) {
-            case 'bomb':
-                return (
-                    <g filter="url(#dropShadow)">
-                        {/* Bomb Body */}
-                        <circle cx="50" cy="55" r="35" fill="url(#grad-bomb)" />
-                        {/* Highlight */}
-                        <circle cx="50" cy="55" r="35" fill="url(#highlight)" />
-                        {/* Wick Cap */}
-                        <rect x="42" y="15" width="16" height="10" rx="2" fill="#94A3B8" />
-                        {/* Wick */}
-                        <path d="M50 15 Q50 5 60 5" stroke="#475569" strokeWidth="3" fill="none" />
-                        {/* Spark */}
-                        <path d="M60 5 L62 2 M60 5 L64 5 M60 5 L62 8" stroke="#FCD34D" strokeWidth="2" />
-                    </g>
-                );
-            case 'shuffle':
-                return (
-                    <g filter="url(#dropShadow)">
-                         {/* Back Arrow (Top-Left to Bottom-Right) - Darker Shade for Depth */}
-                        <path 
-                            d="M 22 35 C 45 35, 55 65, 78 65" 
-                            stroke="#FF844B" 
-                            strokeWidth="18" 
-                            strokeLinecap="round" 
-                            fill="none" 
-                        />
-                        <path d="M72 56 L90 65 L72 74" fill="#FF844B" />
-
-                        {/* Front Arrow (Bottom-Left to Top-Right) - Gradient */}
-                        <path 
-                            d="M 22 65 C 45 65, 55 35, 78 35" 
-                            stroke="url(#grad-shuffle)" 
-                            strokeWidth="18" 
-                            strokeLinecap="round" 
-                            fill="none" 
-                        />
-                        <path d="M72 44 L90 35 L72 26" fill="url(#grad-shuffle)" />
-
-                        {/* Specular Highlight on Front Arrow */}
-                         <path 
-                            d="M 25 65 C 45 65, 53 40, 75 38" 
-                            stroke="url(#highlight)" 
-                            strokeWidth="5" 
-                            strokeLinecap="round" 
-                            fill="none"
-                            opacity="0.7" 
-                        />
-                    </g>
-                );
-            case 'extraMoves':
-                return (
-                    <g filter="url(#dropShadow)">
-                         <path 
-                            d="M55 10 L30 50 L50 50 L45 90 L70 50 L50 50 L55 10 Z" 
-                            fill="url(#grad-bolt)" 
-                            strokeLinejoin="round"
-                        />
-                         <path 
-                            d="M55 10 L30 50 L50 50 L45 90 L70 50 L50 50 L55 10 Z" 
-                            fill="url(#highlight)" 
-                        />
-                    </g>
-                );
-             case 'shield':
-                return (
-                    <g filter="url(#dropShadow)">
-                        <path 
-                            d="M50 10 C20 10, 20 35, 20 35 C20 65, 50 90, 50 90 C50 90, 80 65, 80 35 C80 35, 80 10, 50 10 Z" 
-                            fill="url(#grad-shield)" 
-                        />
-                        <path 
-                            d="M50 15 C25 15, 25 38, 25 38 C25 62, 50 82, 50 82" 
-                            fill="none" 
-                            stroke="white" 
-                            strokeWidth="3" 
-                            strokeOpacity="0.3"
-                        />
-                         <path 
-                            d="M50 10 C20 10, 20 35, 20 35 C20 65, 50 90, 50 90 C50 90, 80 65, 80 35 C80 35, 80 10, 50 10 Z" 
-                            fill="url(#highlight)" 
-                        />
-                    </g>
-                );
-            default: return null;
-        }
-    }
-
-    return (
-        <svg viewBox="0 0 100 100" className={className} xmlns="http://www.w3.org/2000/svg">
-            {defs}
-            {renderIcon()}
-        </svg>
-    );
-};
 
 // --- SHOP TAB ---
 export const ShopTab = () => {
@@ -172,7 +20,7 @@ export const ShopTab = () => {
         { 
             id: 'bomb', 
             label: 'Bomb', 
-            type: 'bomb', // Mapped to ClayIcon
+            type: 'bomb', 
             price: 500, 
             count: boosters.bomb,
             bg: 'bg-white/60'
@@ -215,7 +63,7 @@ export const ShopTab = () => {
                     >
                         {/* 3D Icon Area */}
                         <div className="w-full flex items-center justify-center py-2 filter drop-shadow-md transition-transform group-hover:-translate-y-1">
-                            <ClayIcon type={item.type} className="w-24 h-24" />
+                            <ClayIcon type={item.type as any} className="w-24 h-24" />
                         </div>
                         
                         <div className="text-center w-full z-10">
