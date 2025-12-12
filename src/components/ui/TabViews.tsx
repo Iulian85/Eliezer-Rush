@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../store/useGameStore';
 import { tg } from '../../utils/telegram';
-import ClayIcon from './ClayIcon';
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
+import { View, OrbitControls } from '@react-three/drei';
+import Booster3D from '../3d/Booster3D';
 
 interface PropsWithChildren {
     children: React.ReactNode;
@@ -29,33 +30,56 @@ export const CoinFlipTab = () => {
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-between pb-32 pt-10 px-6 animate-in fade-in">
-             {/* Spacer for 3D Coin */}
-            <div className="flex-1 w-full flex flex-col items-center pt-8">
-                 {/* Result Message Overlay */}
+             
+            {/* Top Info Area */}
+            <div className="w-full flex justify-between items-start z-10">
+                {/* Streak Badge */}
+                {coinFlip.streak > 1 && (
+                     <div className="flex flex-col items-center bg-orange-500/10 backdrop-blur-md rounded-2xl p-2 border border-orange-500/20 animate-bounce">
+                        <span className="text-[10px] font-black uppercase text-orange-600 tracking-wider">Win Streak</span>
+                        <span className="text-2xl font-black text-orange-500">🔥 {coinFlip.streak}</span>
+                     </div>
+                )}
+                {/* Spacer if no streak */}
+                {coinFlip.streak <= 1 && <div />}
+            </div>
+
+             {/* Spacer for 3D Coin Scene */}
+            <div className="flex-1 w-full flex flex-col items-center pt-8 pointer-events-none">
+                 {/* Result Message Overlay - Only show when landed */}
                  {!coinFlip.isFlipping && coinFlip.lastResult && (
-                    <div className={`mt-4 px-6 py-2 rounded-2xl border-2 ${isWin ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'} font-black text-xl animate-bounce shadow-lg`}>
-                        {isWin ? `YOU WON +${bet*2}!` : 'YOU LOST!'}
+                    <div className={`mt-16 px-8 py-3 rounded-2xl border-4 shadow-xl transform transition-all duration-300 animate-in zoom-in ${
+                        isWin 
+                        ? 'bg-green-500 border-white text-white rotate-2' 
+                        : 'bg-gray-200 border-gray-300 text-gray-500 -rotate-2'
+                    }`}>
+                        <div className="text-3xl font-black drop-shadow-md">
+                            {isWin ? 'YOU WON!' : 'YOU LOST'}
+                        </div>
+                        <div className="text-sm font-bold opacity-90 text-center">
+                            {isWin ? `+${bet * 2} ELZR` : `-${bet} ELZR`}
+                        </div>
                     </div>
                  )}
             </div>
 
             {/* Controls */}
-            <div className="w-full max-w-sm flex flex-col gap-4">
+            <div className="w-full max-w-sm flex flex-col gap-4 z-20">
                  
                  {/* Balance Check */}
-                 <div className="flex justify-center mb-2">
-                     <div className="bg-white/40 backdrop-blur-md px-4 py-1 rounded-full border border-white/50 text-sm font-bold text-ref-text">
-                        Balance: {walletBalance.toLocaleString()} ELZR
+                 <div className="flex justify-center mb-1">
+                     <div className="bg-white/60 backdrop-blur-md px-5 py-2 rounded-full border border-white/50 text-sm font-bold text-ref-text shadow-sm flex items-center gap-2">
+                        <span>💰</span> Balance: {walletBalance.toLocaleString()} ELZR
                      </div>
                  </div>
 
                  {/* Bet Amount Selector */}
-                 <div className="bg-white/60 backdrop-blur-md rounded-2xl p-3 flex justify-between items-center shadow-sm">
+                 <div className="bg-white/60 backdrop-blur-md rounded-2xl p-2 flex justify-between items-center shadow-sm">
                     {[100, 500, 1000, 5000].map(amount => (
                         <button
                             key={amount}
                             onClick={() => setBet(amount)}
-                            className={`px-3 py-2 rounded-xl text-xs font-black transition-all ${
+                            className={`flex-1 mx-1 py-2.5 rounded-xl text-xs font-black transition-all ${
                                 bet === amount 
                                 ? 'bg-ref-orange text-white shadow-clay-btn scale-105' 
                                 : 'bg-white/50 text-ref-text hover:bg-white'
@@ -70,25 +94,25 @@ export const CoinFlipTab = () => {
                  <div className="flex gap-4">
                     <button 
                         onClick={() => setChoice('HEADS')}
-                        className={`flex-1 py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
+                        className={`flex-1 py-4 rounded-2xl border-4 transition-all flex flex-col items-center gap-1 active:scale-95 ${
                             choice === 'HEADS' 
-                            ? 'bg-amber-100 border-amber-400 shadow-inner' 
-                            : 'bg-white/60 border-white hover:bg-white'
+                            ? 'bg-amber-100 border-amber-400 shadow-lg scale-[1.02]' 
+                            : 'bg-white/60 border-transparent hover:bg-white'
                         }`}
                     >
-                        <span className="text-2xl">🐹</span>
-                        <span className="font-black text-xs text-ref-text tracking-widest">HEADS</span>
+                        <span className="text-3xl filter drop-shadow-sm">🐹</span>
+                        <span className={`font-black text-xs tracking-widest ${choice === 'HEADS' ? 'text-amber-600' : 'text-ref-text-light'}`}>HEADS</span>
                     </button>
                     <button 
                         onClick={() => setChoice('TAILS')}
-                        className={`flex-1 py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
+                        className={`flex-1 py-4 rounded-2xl border-4 transition-all flex flex-col items-center gap-1 active:scale-95 ${
                             choice === 'TAILS' 
-                            ? 'bg-cyan-100 border-cyan-400 shadow-inner' 
-                            : 'bg-white/60 border-white hover:bg-white'
+                            ? 'bg-cyan-100 border-cyan-400 shadow-lg scale-[1.02]' 
+                            : 'bg-white/60 border-transparent hover:bg-white'
                         }`}
                     >
-                        <span className="text-2xl">💎</span>
-                         <span className="font-black text-xs text-ref-text tracking-widest">TAILS</span>
+                        <span className="text-3xl filter drop-shadow-sm">💎</span>
+                         <span className={`font-black text-xs tracking-widest ${choice === 'TAILS' ? 'text-cyan-600' : 'text-ref-text-light'}`}>TAILS</span>
                     </button>
                  </div>
 
@@ -98,11 +122,15 @@ export const CoinFlipTab = () => {
                     disabled={coinFlip.isFlipping || walletBalance < bet}
                     className={`w-full py-4 rounded-2xl text-xl font-black tracking-widest shadow-clay-btn transition-all active:scale-95 flex items-center justify-center gap-2 ${
                         coinFlip.isFlipping 
-                        ? 'bg-gray-400 cursor-not-allowed' 
-                        : (walletBalance < bet ? 'bg-red-400 opacity-80' : 'btn-primary-3d')
+                        ? 'bg-gray-400 cursor-not-allowed opacity-80' 
+                        : (walletBalance < bet ? 'bg-red-400 opacity-90' : 'btn-primary-3d')
                     }`}
                  >
-                    {coinFlip.isFlipping ? 'FLIPPING...' : (walletBalance < bet ? 'INSUFFICIENT FUNDS' : 'FLIP COIN')}
+                    {coinFlip.isFlipping ? (
+                        <span className="animate-pulse">FLIPPING...</span>
+                    ) : (
+                        walletBalance < bet ? 'INSUFFICIENT FUNDS' : 'FLIP COIN'
+                    )}
                  </button>
             </div>
         </div>
@@ -159,9 +187,12 @@ export const ShopTab = () => {
                         key={item.id} 
                         className={`group relative clay-model ${item.bg} backdrop-blur-md p-4 flex flex-col items-center gap-3 transition-transform hover:scale-[1.02]`}
                     >
-                        {/* 3D Icon Area */}
-                        <div className="w-full flex items-center justify-center py-2 filter drop-shadow-md transition-transform group-hover:-translate-y-1">
-                            <ClayIcon type={item.type as any} className="w-24 h-24" />
+                        {/* 3D Viewport Area */}
+                        <div className="w-full h-32 relative rounded-xl overflow-hidden mb-1">
+                             <View className="absolute inset-0 w-full h-full">
+                                <Booster3D type={item.type as any} />
+                                <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={2} />
+                             </View>
                         </div>
                         
                         <div className="text-center w-full z-10">
@@ -180,7 +211,7 @@ export const ShopTab = () => {
 
                         {/* Inventory Badge */}
                         {item.count !== undefined && item.count > 0 && (
-                            <div className="absolute top-3 right-3 w-7 h-7 bg-ref-orange text-white rounded-full flex items-center justify-center text-xs font-black shadow-lg border-2 border-white">
+                            <div className="absolute top-3 right-3 w-7 h-7 bg-ref-orange text-white rounded-full flex items-center justify-center text-xs font-black shadow-lg border-2 border-white z-10">
                                 {item.count}
                             </div>
                         )}
@@ -210,7 +241,7 @@ export const TasksTab = () => {
                         <div className="bg-white/70 backdrop-blur-xl border border-white/60 rounded-[2rem] p-4 flex items-center justify-between shadow-clay-card transform transition-transform active:scale-[0.98]">
                             
                             <div className="flex items-center gap-4">
-                                {/* 3D Sphere Icon */}
+                                {/* 3D Sphere Icon - CSS only */}
                                 <div className={`clay-sphere w-14 h-14 bg-gradient-to-br ${task.color} flex items-center justify-center text-2xl text-white shadow-lg`}>
                                     <span className="drop-shadow-md">{task.icon}</span>
                                 </div>
@@ -259,7 +290,7 @@ export const FrensTab = () => {
             {/* 3D Invite Card */}
             <div className="clay-model bg-gradient-to-br from-white to-blue-50 p-6 flex flex-col items-center text-center relative overflow-hidden mb-6">
                 
-                {/* 3D Coin Floating */}
+                {/* 3D Coin Floating - CSS Only */}
                 <div className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center text-5xl shadow-[0_15px_30px_rgba(234,179,8,0.4),inset_0_-5px_10px_rgba(0,0,0,0.1),inset_0_5px_10px_rgba(255,255,255,0.5)] mb-4 animate-float border-4 border-yellow-200">
                     💰
                 </div>

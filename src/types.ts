@@ -55,6 +55,7 @@ export interface GameStoreState {
   coinFlip: {
     isFlipping: boolean;
     lastResult: 'HEADS' | 'TAILS' | null;
+    streak: number;
   };
   
   initGame: (level?: number) => void;

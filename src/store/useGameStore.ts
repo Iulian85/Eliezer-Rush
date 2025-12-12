@@ -84,7 +84,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   // Coin Flip
   coinFlip: {
     isFlipping: false,
-    lastResult: null
+    lastResult: null,
+    streak: 0
   },
 
   setActiveTab: (tab: TabType) => {
@@ -423,7 +424,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   flipCoin: async (bet, choice) => {
-    const { walletBalance } = get();
+    const { walletBalance, coinFlip } = get();
     if (walletBalance < bet) {
         hapticNotify('error');
         return;
@@ -432,23 +433,28 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     // Deduct bet and start spinning
     set({ 
         walletBalance: walletBalance - bet,
-        coinFlip: { isFlipping: true, lastResult: null }
+        coinFlip: { ...coinFlip, isFlipping: true, lastResult: null }
     });
     hapticFeedback('medium');
 
-    // Simulate Network/Processing Delay and Animation Time
+    // Wait for the visual toss animation (matched with 3D scene timing)
     await new Promise(r => setTimeout(r, 2000));
 
     // Determine result
     const isHeads = Math.random() > 0.5;
     const result = isHeads ? 'HEADS' : 'TAILS';
-    
     const win = result === choice;
+    
     const newBalance = win ? get().walletBalance + (bet * 2) : get().walletBalance;
+    const newStreak = win ? coinFlip.streak + 1 : 0;
 
     set({ 
         walletBalance: newBalance,
-        coinFlip: { isFlipping: false, lastResult: result }
+        coinFlip: { 
+            isFlipping: false, 
+            lastResult: result,
+            streak: newStreak
+        }
     });
 
     if (win) hapticNotify('success'); 
