@@ -1,7 +1,7 @@
 
 import { useGameStore } from '../../store/useGameStore';
 import Navigation from './Navigation';
-import { ShopTab, TasksTab, FrensTab, WalletTab } from './TabViews';
+import { ShopTab, TasksTab, FrensTab, WalletTab, CoinFlipTab } from './TabViews';
 import { showAd } from '../../utils/adsgram';
 import { useState, useEffect } from 'react';
 
@@ -44,6 +44,7 @@ export default function Menu() {
         case 'SHOP': return <ShopTab />;
         case 'FRENS': return <FrensTab />;
         case 'WALLET': return <WalletTab />;
+        case 'COINFLIP': return <CoinFlipTab />;
         case 'HOME':
         default:
             return (

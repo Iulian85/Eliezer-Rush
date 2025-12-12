@@ -9,7 +9,7 @@ export interface Tile {
   isMatched?: boolean; 
 }
 
-export type TabType = 'HOME' | 'TASKS' | 'SHOP' | 'FRENS' | 'WALLET';
+export type TabType = 'HOME' | 'TASKS' | 'SHOP' | 'FRENS' | 'WALLET' | 'COINFLIP';
 export type BoosterType = 'bomb' | 'shuffle' | 'extraMoves' | 'shield';
 
 export interface User {
@@ -50,6 +50,12 @@ export interface GameStoreState {
 
   user: User | null;
   frens: Fren[];
+
+  // Coin Flip State
+  coinFlip: {
+    isFlipping: boolean;
+    lastResult: 'HEADS' | 'TAILS' | null;
+  };
   
   initGame: (level?: number) => void;
   startGame: (level: number) => void;
@@ -63,6 +69,8 @@ export interface GameStoreState {
   
   activateBooster: (type: BoosterType) => void;
   buyBooster: (type: BoosterType, price: number) => void;
+  
+  flipCoin: (bet: number, choice: 'HEADS' | 'TAILS') => Promise<void>;
 }
 
 export const TOKEN_TYPES: TokenType[] = ['HMSTR', 'USDT', 'NOT', 'DOGS', 'TON', 'ELZR'];

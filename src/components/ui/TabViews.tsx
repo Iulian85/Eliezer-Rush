@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useGameStore } from '../../store/useGameStore';
 import { tg } from '../../utils/telegram';
 import ClayIcon from './ClayIcon';
@@ -11,6 +12,102 @@ interface PropsWithChildren {
 const SectionTitle: React.FC<PropsWithChildren> = ({ children }) => (
     <h2 className="text-3xl font-black text-ref-text drop-shadow-sm mb-6 text-center tracking-wide">{children}</h2>
 );
+
+// --- COIN FLIP TAB ---
+export const CoinFlipTab = () => {
+    const { walletBalance, flipCoin, coinFlip } = useGameStore();
+    const [bet, setBet] = useState(100);
+    const [choice, setChoice] = useState<'HEADS'|'TAILS'>('HEADS');
+
+    const handleFlip = () => {
+        if (!coinFlip.isFlipping) {
+            flipCoin(bet, choice);
+        }
+    };
+
+    const isWin = coinFlip.lastResult === choice;
+
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-between pb-32 pt-10 px-6 animate-in fade-in">
+             {/* Spacer for 3D Coin */}
+            <div className="flex-1 w-full flex flex-col items-center pt-8">
+                 {/* Result Message Overlay */}
+                 {!coinFlip.isFlipping && coinFlip.lastResult && (
+                    <div className={`mt-4 px-6 py-2 rounded-2xl border-2 ${isWin ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'} font-black text-xl animate-bounce shadow-lg`}>
+                        {isWin ? `YOU WON +${bet*2}!` : 'YOU LOST!'}
+                    </div>
+                 )}
+            </div>
+
+            {/* Controls */}
+            <div className="w-full max-w-sm flex flex-col gap-4">
+                 
+                 {/* Balance Check */}
+                 <div className="flex justify-center mb-2">
+                     <div className="bg-white/40 backdrop-blur-md px-4 py-1 rounded-full border border-white/50 text-sm font-bold text-ref-text">
+                        Balance: {walletBalance.toLocaleString()} ELZR
+                     </div>
+                 </div>
+
+                 {/* Bet Amount Selector */}
+                 <div className="bg-white/60 backdrop-blur-md rounded-2xl p-3 flex justify-between items-center shadow-sm">
+                    {[100, 500, 1000, 5000].map(amount => (
+                        <button
+                            key={amount}
+                            onClick={() => setBet(amount)}
+                            className={`px-3 py-2 rounded-xl text-xs font-black transition-all ${
+                                bet === amount 
+                                ? 'bg-ref-orange text-white shadow-clay-btn scale-105' 
+                                : 'bg-white/50 text-ref-text hover:bg-white'
+                            }`}
+                        >
+                            {amount}
+                        </button>
+                    ))}
+                 </div>
+
+                 {/* Choice Toggle */}
+                 <div className="flex gap-4">
+                    <button 
+                        onClick={() => setChoice('HEADS')}
+                        className={`flex-1 py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
+                            choice === 'HEADS' 
+                            ? 'bg-amber-100 border-amber-400 shadow-inner' 
+                            : 'bg-white/60 border-white hover:bg-white'
+                        }`}
+                    >
+                        <span className="text-2xl">🐹</span>
+                        <span className="font-black text-xs text-ref-text tracking-widest">HEADS</span>
+                    </button>
+                    <button 
+                        onClick={() => setChoice('TAILS')}
+                        className={`flex-1 py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
+                            choice === 'TAILS' 
+                            ? 'bg-cyan-100 border-cyan-400 shadow-inner' 
+                            : 'bg-white/60 border-white hover:bg-white'
+                        }`}
+                    >
+                        <span className="text-2xl">💎</span>
+                         <span className="font-black text-xs text-ref-text tracking-widest">TAILS</span>
+                    </button>
+                 </div>
+
+                 {/* Action Button */}
+                 <button
+                    onClick={handleFlip}
+                    disabled={coinFlip.isFlipping || walletBalance < bet}
+                    className={`w-full py-4 rounded-2xl text-xl font-black tracking-widest shadow-clay-btn transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                        coinFlip.isFlipping 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : (walletBalance < bet ? 'bg-red-400 opacity-80' : 'btn-primary-3d')
+                    }`}
+                 >
+                    {coinFlip.isFlipping ? 'FLIPPING...' : (walletBalance < bet ? 'INSUFFICIENT FUNDS' : 'FLIP COIN')}
+                 </button>
+            </div>
+        </div>
+    );
+};
 
 // --- SHOP TAB ---
 export const ShopTab = () => {

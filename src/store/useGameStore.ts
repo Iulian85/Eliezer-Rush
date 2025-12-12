@@ -81,6 +81,12 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   
   lastRewardClaimedDate: null,
 
+  // Coin Flip
+  coinFlip: {
+    isFlipping: false,
+    lastResult: null
+  },
+
   setActiveTab: (tab: TabType) => {
     set({ activeTab: tab });
     hapticFeedback('light');
@@ -194,11 +200,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
                 hapticNotify('success');
             }, 500);
         } else if (type === 'shield') {
-            // Shield logic placeholder - assuming it prevents game over
-            // For now just consume it or set state
+            // Shield logic placeholder
              set({ activeBooster: type });
              hapticFeedback('medium');
-             // In a full implementation, you would save 'isShielded' state here
         } else {
             // Bomb needs a target selection
             set({ activeBooster: type });
@@ -239,13 +243,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         // Deduct Booster
         set({ boosters: { ...boosters, bomb: boosters.bomb - 1 } });
         
-        // Proceed to cascade logic similar to match
-        // ... reuse match logic below ...
-        // We'll insert the matches into the flow
-        // Need to refactor flow slightly to handle 'matches' passed in
-        // For simplicity, I'll copy the cascade logic here
-        
-        const matchScore = matches.size * 20; // Bonus points for bomb
+        const matchScore = matches.size * 20; 
         
         // Set matched for particle effects
         const matchedTiles = grid.filter(t => matches.has(t.id));
@@ -270,15 +268,12 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         set({ grid: nextGrid, score: get().score + matchScore });
         await new Promise(r => setTimeout(r, 400));
         
-        // Check for new matches resulting from cascade
-        // This is a simplified recursion - ideally refactor common cascade loop
         set({ isProcessing: false });
-        // Trigger selectTile again? No, just end turn logic check
         return; 
     }
     // --- End Bomb Logic ---
 
-    const tile2 = grid.find(t => t.id === id); // The newly clicked tile
+    const tile2 = grid.find(t => t.id === id); 
     
     // First selection
     if (!selectedId) {
@@ -306,7 +301,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     // --- Start Processing Swap ---
     set({ isProcessing: true, selectedId: null });
 
-    // 1. Optimistic Swap for UI animation
+    // 1. Optimistic Swap
     const swappedGrid = grid.map(t => {
       if (t.id === tile1.id) return { ...t, x: tile2.x, y: tile2.y };
       if (t.id === tile2.id) return { ...t, x: tile1.x, y: tile1.y };
@@ -318,10 +313,10 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     // 2. Check for matches
     let matches = checkMatch(swappedGrid);
 
-    // 3. Handle Invalid Move (no matches)
+    // 3. Handle Invalid Move
     if (matches.size === 0) {
       hapticNotify('warning');
-      set({ grid }); // Revert to original grid
+      set({ grid }); 
       await new Promise(r => setTimeout(r, 300));
       set({ isProcessing: false });
       return;
@@ -336,7 +331,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     let totalScoreThisTurn = 0;
 
     while (matches.size > 0) {
-      // 4. Update score & trigger particle effects
       const matchScore = matches.size * 10 * combo;
       totalScoreThisTurn += matchScore;
       if (combo > 1) hapticFeedback('heavy');
@@ -344,17 +338,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       const matchedTiles = currentGrid.filter(t => matches.has(t.id));
       const matchedPositions = matchedTiles.map(t => ({ x: t.x, y: t.y }));
       set({ lastMatchedPositions: matchedPositions });
-      setTimeout(() => set({ lastMatchedPositions: [] }), 300); // Clear particles after a moment
+      setTimeout(() => set({ lastMatchedPositions: [] }), 300); 
       
-      // 5. Create a new grid with matched tiles removed and remaining tiles "falling"
       const nextGrid: Tile[] = [];
       for (let x = 0; x < GRID_W; x++) {
           const column = currentGrid.filter(t => t.x === x && !matches.has(t.id)).sort((a,b) => a.y - b.y);
-          // Re-assign Y indices for fallen tiles
           column.forEach((tile, newY) => {
               nextGrid.push({ ...tile, y: newY });
           });
-          // Add new tiles to fill the top
           for (let y = column.length; y < GRID_H; y++) {
               nextGrid.push({
                   id: uuidv4(),
@@ -407,7 +398,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
             lastRewardClaimedDate: today
         });
         hapticNotify('success');
-        // Save logic
         storage.setItem('eliezer_data_v2', JSON.stringify({
             walletBalance: walletBalance + 100,
             boosters: get().boosters,
@@ -430,5 +420,45 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     } else {
         hapticNotify('error');
     }
+  },
+
+  flipCoin: async (bet, choice) => {
+    const { walletBalance } = get();
+    if (walletBalance < bet) {
+        hapticNotify('error');
+        return;
+    }
+
+    // Deduct bet and start spinning
+    set({ 
+        walletBalance: walletBalance - bet,
+        coinFlip: { isFlipping: true, lastResult: null }
+    });
+    hapticFeedback('medium');
+
+    // Simulate Network/Processing Delay and Animation Time
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Determine result
+    const isHeads = Math.random() > 0.5;
+    const result = isHeads ? 'HEADS' : 'TAILS';
+    
+    const win = result === choice;
+    const newBalance = win ? get().walletBalance + (bet * 2) : get().walletBalance;
+
+    set({ 
+        walletBalance: newBalance,
+        coinFlip: { isFlipping: false, lastResult: result }
+    });
+
+    if (win) hapticNotify('success'); 
+    else hapticNotify('error');
+    
+    // Save state
+    storage.setItem('eliezer_data_v2', JSON.stringify({
+        walletBalance: newBalance,
+        boosters: get().boosters,
+        lastRewardClaimedDate: get().lastRewardClaimedDate
+    }));
   }
 }));

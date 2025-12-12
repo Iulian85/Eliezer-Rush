@@ -4,6 +4,7 @@ import { Text3D, Center, Float, Environment, Sparkles, Sphere, Torus, Icosahedro
 import { EffectComposer, Bloom, TiltShift2 } from '@react-three/postprocessing';
 import { useGameStore } from '../../store/useGameStore';
 import Token3D from './Token3D';
+import CoinFlipScene from './CoinFlipScene';
 import { getPos } from '../../utils/grid';
 import * as THREE from 'three';
 
@@ -169,6 +170,10 @@ const Title3D = () => (
 const MenuScene = () => {
     const activeTab = useGameStore(s => s.activeTab);
     
+    if (activeTab === 'COINFLIP') {
+        return <CoinFlipScene />;
+    }
+
     return (
         <>
             {/* Show Text ONLY on Home, Show Decor on others */}
